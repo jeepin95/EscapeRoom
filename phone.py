@@ -9,34 +9,58 @@ end_pin = Pin(20, mode=Pin.IN, pull=Pin.PULL_UP)
 call_pin.high()
 end_pin.high()
 
-row_list = [6, 7, 8, 9]
-col_list = [13, 12, 11, 10]
+KEY_UP = 0
+KEY_DOWN = 1
 
-for x in range(0,4):
-    row_list[x] = Pin(row_list[x], mode=Pin.OUT)
-    row_list[x].value(1)
-    col_list[x] = Pin(col_list[x], mode=Pin.IN, pull=Pin.PULL_UP)
+# ROW_1 = Keypad Pin 2 (Blue)
+# ROW_2 =  Keypad Pin 7 (Brown)
+# ROW_3 =  Keypad Pin 6 (Red)
+# ROW_4 =  Keypad Pin 4 (Yellow)
+# COL_1 = Keypad Pin 3 (Green)
+# COL_2 = Keypad Pin 1 (Purple)
+# COL_3 = Keypad Pin 5 (Orange)
 
-key_map = [['A', '3', '2', '1'],
-           ['B', '6', '5', '4'],
-           ['C', '9', '8', '7'],
-           ['D', '#', '0', '*']]
+col_pins = [
+    Pin(6, mode=Pin.IN, pull=Pin.PULL_DOWN),
+    Pin(7, mode=Pin.IN, pull=Pin.PULL_DOWN),
+    Pin(8, mode=Pin.IN, pull=Pin.PULL_DOWN),
+    Pin(9, mode=Pin.IN, pull=Pin.PULL_DOWN)
+]
 
-def keypad_4x4_read(cols, rows):
-    for r in rows:
-        r.value(0)
-        result = [cols[0].value(), cols[1].value(),
-                  cols[2].value(), cols[3].value()]
-        if min(result) == 0:
-            key = key_map[int(rows.index(r))][int(result.index(0))]
-            r.value(1)  # manages key keept pressed
-            return(key)
-        r.value(1)
+row_pins = [
+    Pin(10, mode=Pin.OUT),
+    Pin(11, mode=Pin.OUT),
+    Pin(12, mode=Pin.OUT)
+]
+
+
+
+key_map = [
+    ['1','2','3'],
+    ['4','5','6'],
+    ['7','8','9'],
+    ['*','0','#']
+]
+
+def keypad_3x4_read(cols, rows, keys):
+    key = None
+    for y,row in enumerate(rows):
+        for x,col in enumerate(cols):
+            # print(col)
+            rows[y].high()
+            if cols[x].value() == KEY_DOWN:
+                key = KEY_DOWN
+            if cols[x].value() == KEY_UP:
+                key = KEY_UP
+            rows[y].low()
+            if key == KEY_DOWN:
+                print("Key Pressed: ", keys[x][y])
+                return keys[x][y]
 
 keys_used = []
 
 mp3 = dfplayer(0, 16, 17)
-# mp3.play_track(2, 2)
+mp3.play_track(2, 2)
 
 key_tracks = {
     '1':1,
@@ -55,11 +79,9 @@ key_tracks = {
 
 
 valid_answers = [
-    {'answer':['2','0','2','8','5','2','2','5','8','5'], 'folder':4, 'track':1, 'pin_high':None},
-    {'answer':['4','0','4'], 'folder':2, 'track':2, 'pin_high':None},
-    {'answer':['9','1','1'], 'folder':2, 'track':3, 'pin_high':None},
-    {'answer':['*','*','*'], 'folder':2, 'track':4, 'pin_high':None},
-    {'answer':['7','2','8','5','1','6','2','1','0','5'], 'folder':2, 'track':2, 'pin_high':None}
+    {'answer':['2','0','2','8','5','2','2','5','8','5'], 'folder':1, 'track':1, 'pin_high':None},
+    {'answer':['2','0','5','7','2','3','2','0','2','1'], 'folder':1, 'track':2, 'pin_high':None},
+    {'answer':['2','5','2','4','4','7','1','5','4','5'], 'folder':1, 'track':3, 'pin_high':None},
 ]
 
 def verify_answer(answer, answer_list):
@@ -80,7 +102,7 @@ def verify_answer(answer, answer_list):
     if valid is not None:
         return answer_list[valid]
     else:
-        return {'answer':[], 'folder':2, 'track':1}
+        return {'answer':[], 'folder':1, 'track':4}
 
 def place_call(pin):
     global keys_used, valid_answers
@@ -105,12 +127,12 @@ end_pin.irq(end_call, Pin.IRQ_FALLING)
 mp3.play_track(2,3)
 
 while True:
-    key = keypad_4x4_read(col_list, row_list)
+    key = keypad_3x4_read(col_pins, row_pins, key_map)
     if key != None:
         utime.sleep(0.4)
         keys_used.append(key)
         if key in key_tracks.keys():
-            mp3.play_track(3, key_tracks[key])
+            mp3.play_track(2, key_tracks[key])
         print(keys_used)
 
 
