@@ -22,7 +22,7 @@ class dfplayer:
             total += int.from_bytes(b, 'big')
         total += 1
         check = total.to_bytes(2, 'big')
-        print("Checksum: ", check)
+        # print("Checksum: ", check)
         return check
 
     def _tx(self, cmd, lsb=b'\x00', msb=b'\x00'):
@@ -40,7 +40,7 @@ class dfplayer:
         msg.insert(0,b'\x7E') # Start message
 
         msg.append(b'\xEF') # stop message
-        print(msg)
+        # print(msg)
         for chunk in msg:
             self._uart.write(chunk)
         sleep_ms(1000)
@@ -74,5 +74,6 @@ class dfplayer:
             folder (Int): The folder number (01-99) to play from
             track (Int): The file to play (001-999)
         """
+        print("Playing: {}, {}".format(folder,track))
         self._tx(0x0F, chr(folder), chr(track))
 
