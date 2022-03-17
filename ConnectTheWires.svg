@@ -208,7 +208,7 @@ Selected Colors: #0000d3, #02abea, #1fb714, #dd0907, #f20884, #fbf305
      inkscape:groupmode="layer"
      id="layer1"
      inkscape:label="Dimensions"
-     style="display:none">
+     style="display:inline">
     <path
        style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#marker6296);marker-end:url(#Arrow1Lend)"
        d="M 6.9999999,-9.8564246 H 240.3"
