@@ -43,7 +43,7 @@ class dfplayer:
         # print(msg)
         for chunk in msg:
             self._uart.write(chunk)
-        sleep_ms(1000)
+        sleep_ms(500)
 
     def set_volume(self, volume):
         """Set the DFPlayer output volume (NOT CURRENTLY WORKING)
