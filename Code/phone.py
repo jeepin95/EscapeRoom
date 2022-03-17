@@ -6,6 +6,8 @@ from DFPlayer import dfplayer
 
 call_pin = Pin(21, mode=Pin.IN, pull=Pin.PULL_UP)
 end_pin = Pin(20, mode=Pin.IN, pull=Pin.PULL_UP)
+relay_pin = Pin(26, mode=Pin.OUT, pull=Pin.PULL_DOWN)
+relay_pin.low()
 call_pin.high()
 end_pin.high()
 
@@ -60,7 +62,7 @@ def keypad_3x4_read(cols, rows, keys):
 keys_used = []
 
 mp3 = dfplayer(0, 16, 17)
-mp3.play_track(2, 2)
+# mp3.play_track(2, 2)
 
 key_tracks = {
     '1':1,
@@ -79,9 +81,10 @@ key_tracks = {
 
 
 valid_answers = [
-    {'answer':['2','0','2','8','5','2','2','5','8','5'], 'folder':1, 'track':1, 'pin_high':None},
-    {'answer':['2','0','5','7','2','3','2','0','2','1'], 'folder':1, 'track':2, 'pin_high':None},
-    {'answer':['2','5','2','4','4','7','1','5','4','5'], 'folder':1, 'track':3, 'pin_high':None},
+    {'answer':['2','0','2','8','5','2','2','5','8','5'], 'mode':'MP3', 'folder':1, 'track':1, 'pin_high':None},
+    {'answer':['2','0','5','7','2','3','2','0','2','1'], 'mode':'PIN', 'folder':1, 'track':2, 'pin_high':relay_pin},
+    {'answer':['2','5','2','4','4','7','1','5','4','5'], 'mode':'MP3', 'folder':1, 'track':3, 'pin_high':None},
+    # {'answer':['2','0'], 'mode':'PIN', 'folder':1, 'track':2, 'pin_high':relay_pin},
 ]
 
 def verify_answer(answer, answer_list):
@@ -102,14 +105,20 @@ def verify_answer(answer, answer_list):
     if valid is not None:
         return answer_list[valid]
     else:
-        return {'answer':[], 'folder':1, 'track':4}
+        return {'answer':[], 'mode':'MP3', 'folder':1, 'track':4}
 
 def place_call(pin):
     global keys_used, valid_answers
     print("Call placed")
     result = verify_answer(keys_used, valid_answers)
-    print(result)
-    mp3.play_track(result['folder'], result['track'])
+    if result['mode'] == 'MP3':
+        print(result)
+        mp3.play_track(result['folder'], result['track'])
+    elif result['mode'] == 'PIN':
+        result['pin_high'].high()
+        utime.sleep(0.5)
+        result['pin_high'].low()
+
 
 
 
@@ -124,7 +133,7 @@ def end_call(pin):
 
 call_pin.irq(place_call, Pin.IRQ_FALLING)
 end_pin.irq(end_call, Pin.IRQ_FALLING)
-mp3.play_track(2,3)
+# mp3.play_track(2,3)
 
 while True:
     key = keypad_3x4_read(col_pins, row_pins, key_map)
