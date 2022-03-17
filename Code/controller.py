@@ -12,8 +12,11 @@ mp3 = dfplayer(0, 16, 17)
 clock_display = tm1637.TM1637(clk=Pin(3), dio=Pin(2))
 
 # Configure Pins
-reset_pin = Pin(22, mode=Pin.OUT, pull=Pin.PULL_UP)
-stop_pin = Pin(26, mode=Pin.IN, pull=Pin.PULL_UP)
+# reset_pin = Pin(22, mode=Pin.OUT, pull=Pin.PULL_UP)
+start_pin = Pin(26, mode=Pin.IN, pull=Pin.PULL_UP)
+print("Start Pin: ", start_pin.value())
+
+stop_pin = Pin(22, mode=Pin.IN, pull=Pin.PULL_UP)
 
 MINUTES_REMAINING_50 = {'folder':5, 'track':50}
 MINUTES_REMAINING_40 = {'folder':5, 'track':40}
@@ -24,7 +27,7 @@ MINUTES_REMAINING_5 = {'folder':5, 'track':5}
 ALARM_SOUND = {'folder':5, 'track':100}
 WIN_SOUND = {'folder':5, 'track':102}
 
-TOTAL_MINUTES = 11
+TOTAL_MINUTES = 60
 
 WARNING_50 = 60*50
 WARNING_40 = 60*40
@@ -41,9 +44,9 @@ WARNING_10_ISSUED = False
 WARNING_5_ISSUED = False
 
 
-reset_pin.low()
-utime.sleep_ms(100)
-reset_pin.high()
+# reset_pin.low()
+# utime.sleep_ms(100)
+# reset_pin.high()
 
 
 # Total time in seconds
@@ -52,7 +55,7 @@ total_time = 60*TOTAL_MINUTES
 # Global variables to store the remaining minutes and seconds
 m = 0
 s = 0
-puzzle_complete = [False, True, True]
+puzzle_complete = False
 last_time = 0
 brightness = 7
 
@@ -87,18 +90,6 @@ def get_numbers(end_time):
 
 
 
-def puzzle_handler(pin):
-    global last_time, puzzle_1_complete, puzzle_2_complete, puzzle_3_complete
-    new_time = utime.ticks_ms()
-
-    if(new_time - last_time) > 200:
-        puzzle = pin_id(pin)
-        puzzle_complete[puzzle] = True
-        print(pin)
-        print(puzzle_complete)
-        print("Fully Complete: ", all(puzzle_complete))
-        last_time = new_time
-
 def blink_clock(timer):
     '''
     Blink the clock 1.5 times per second
@@ -112,28 +103,42 @@ def blink_clock(timer):
 
 
 def stop_handler(pin):
-    global last_time
+    global last_time, puzzle_complete
     new_time = utime.ticks_ms()
 
     if(new_time - last_time) > 200:
-        puzzle_complete[0] = True
+        puzzle_complete = True
         print("Puzzle complete")
         last_time = new_time
 
-# Initialize IRQ handlers for the 3 puzzle completion
-# puzzle_1_pin.irq(trigger=Pin.IRQ_FALLING, handler=puzzle_handler)
-# puzzle_2_pin.irq(trigger=Pin.IRQ_FALLING, handler=puzzle_handler)
-# puzzle_3_pin.irq(trigger=Pin.IRQ_FALLING, handler=puzzle_handler)
+# Initialize IRQ handlers for puzzle completion
 stop_pin.irq(trigger=Pin.IRQ_FALLING, handler=stop_handler)
 
 print(puzzle_complete)
 
+game_started = False
+
+while game_started == False:
+    val = start_pin.value()
+    print(val)
+    if val == 0:
+        game_started = True
+    else:
+        print(val)
+    sleep(0.1)
+        
+
+mp3.play_track(5, 103)
+sleep(7)
+
 # Initialize the timer
 start_time = time.time()
 end_time = start_time + total_time
+print("Started: ", start_time)
+print("End Time: ", end_time)
 
 # Loop while there is still time remaining and all puzzles have not been completed
-while time.time() < end_time and not all(puzzle_complete):
+while time.time() < end_time and puzzle_complete == False:
     now = time.time()
     m, s = get_numbers(end_time)
     clock_display.numbers(m, s)
@@ -158,7 +163,7 @@ while time.time() < end_time and not all(puzzle_complete):
     
     
 
-if not all(puzzle_complete):
+if puzzle_complete == False:
     mp3.play_track(ALARM_SOUND['folder'], ALARM_SOUND['track'])
 
 timer = Timer()
