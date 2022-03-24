@@ -13,8 +13,7 @@ from machine import Pin
 from utime import sleep
 from code_flasher import morse_code
 
-MODE = 'DEBUG'
-# MODE = 'PRODUCTION'
+DEBUG = False
 
 # Define the pins for each wire
 ONE = 18
@@ -43,7 +42,7 @@ LED_PIN = 22
 
 # Configure the LED pin for output and flash it as a test
 led = Pin(LED_PIN, Pin.OUT)
-if MODE == 'DEBUG':
+if DEBUG == True:
     print("LED ON")
     led.high()
     sleep(2)
@@ -106,8 +105,9 @@ def read_pins():
             # Return the right pin to low and an input
             pr.low()
             pr.init(pr.IN, pr.PULL_DOWN)
-    if MODE == 'DEBUG':
+    if DEBUG == True:
         print(connected_pins)
+        sleep(0.1)
 
 print("Connect the wires v1.5")
 

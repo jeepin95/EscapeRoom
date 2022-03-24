@@ -77,6 +77,8 @@ puzzle_complete = False
 last_time = 0
 brightness = 7
 
+
+
 # Initialize the display
 clock_display.brightness(brightness)
 clock_display.show("----")
@@ -164,12 +166,25 @@ end_time = start_time + total_time
 print("Started: ", start_time)
 print("End Time: ", end_time)
 
+pin_low = False
+ticks_us_pin = None
+
 # Loop while there is still time remaining and all puzzles have not been completed
 # TODO: Adjust this to that time will be counted up after it expires
 while time.time() < end_time and puzzle_complete == False:
     now = time.time()
     m, s = get_numbers(end_time)
     clock_display.numbers(m, s)
+
+    if stop_pin.value() == 0:
+        if pin_low = False:
+            pin_low = True
+            ticks_us_pin = time.ticks_us()
+        elif pin_low = True:
+            if time.ticks_diff(time.ticks_us(), ticks_us_pin) > 400:
+                puzzle_complete = True
+    else:
+        pin_low = False
 
     # Check and issue an MP3 time warning if needed
     if (WARNING_50_ISSUED == False and end_time-now < WARNING_50):
