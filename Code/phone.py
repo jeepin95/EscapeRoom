@@ -139,7 +139,7 @@ def verify_answer(answer, answer_list):
         return {'answer':[], 'mode':'MP3', 'folder':1, 'track':4}
 
 # Used when the place call button is pressed
-def place_call(pin):
+def place_call():
     global keys_used, valid_answers
     print("Call placed")
     result = verify_answer(keys_used, valid_answers)
@@ -159,7 +159,7 @@ def place_call(pin):
     keys_used = []
 
 # Used when the end call button is pressed
-def end_call(pin):
+def end_call():
     global keys_used
 
     # Pause an MP3 if it is playing
@@ -170,11 +170,41 @@ def end_call(pin):
     print("Call ended")
 
 # Configure interrupts for the call and end buttons
-call_pin.irq(place_call, Pin.IRQ_FALLING)
-end_pin.irq(end_call, Pin.IRQ_FALLING)
+# call_pin.irq(place_call, Pin.IRQ_FALLING)
+# end_pin.irq(end_call, Pin.IRQ_FALLING)
+
+call_low = False
+end_low = False
+call_ticks = None
+end_ticks = None
 
 # Loop forever
 while True:
+
+    if call_pin.value() == 0:
+        if call_low == False:
+            call_low = True
+            call_ticks = time.ticks_us()
+        elif call_low == True:
+            if time.ticks_diff(time.ticks_us(), call_ticks) > 400:
+                place_call()
+                call_ticks = time.ticks_us()
+    else:
+        call_low = False
+
+    if end_pin.value() == 0:
+        if end_low == False:
+            end_low = True
+            end_ticks = time.ticks_us()
+        elif end_low == True:
+            if time.ticks_diff(time.ticks_us(), end_ticks) > 400:
+                end_call()
+                end_ticks = time.ticks_us()
+    else:
+        end_low = False
+
+
+        
     key = keypad_3x4_read(col_pins, row_pins, key_map)
     if key != None:
         # Delay .2 seconds, if key is held it will be repeated
