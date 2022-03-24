@@ -15,7 +15,7 @@ import time
 import tm1637
 from DFPlayer import dfplayer
 
-DEBUG = True
+DEBUG = False
 
 # Define the total number of minutes available for the game
 TOTAL_MINUTES = 60
@@ -137,7 +137,7 @@ def stop_handler(pin):
         last_time = new_time
 
 # Initialize IRQ handlers for puzzle completion
-stop_pin.irq(trigger=Pin.IRQ_FALLING, handler=stop_handler)
+# stop_pin.irq(trigger=Pin.IRQ_FALLING, handler=stop_handler)
 
 print(puzzle_complete)
 
@@ -177,10 +177,10 @@ while time.time() < end_time and puzzle_complete == False:
     clock_display.numbers(m, s)
 
     if stop_pin.value() == 0:
-        if pin_low = False:
+        if pin_low == False:
             pin_low = True
             ticks_us_pin = time.ticks_us()
-        elif pin_low = True:
+        elif pin_low == True:
             if time.ticks_diff(time.ticks_us(), ticks_us_pin) > 400:
                 puzzle_complete = True
     else:
