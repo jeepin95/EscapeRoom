@@ -115,7 +115,7 @@ print("Connect the wires v1.5")
 # The pins represent the right pins that should be connected in the order of the left pins they connect to.
 # {'pins':[], 'name':'', 'msg':''}
 answers = [
-    {'pins':[ORANGE_W, ORANGE, GREEN_W, BLUE, BLUE_W, GREEN, BROWN_W, BROWN], 'name':'Standard', 'msg':'resources'},
+    {'pins':[ORANGE_W, ORANGE, GREEN_W, BLUE, BLUE_W, GREEN, BROWN_W, BROWN], 'name':'Standard', 'msg':'avsar'},
 ]
 
 # Loop forever, if an answer is correct display a message.
