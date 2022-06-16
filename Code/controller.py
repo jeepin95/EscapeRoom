@@ -18,7 +18,7 @@ from DFPlayer import dfplayer
 DEBUG = False
 
 # Define the total number of minutes available for the game
-TOTAL_MINUTES = 60
+TOTAL_MINUTES = 90
 
 # Configure the MP3 player on pins 16 and 17
 mp3 = dfplayer(0, 16, 17)
@@ -83,7 +83,7 @@ brightness = 7
 clock_display.brightness(brightness)
 clock_display.show("----")
 sleep(1)
-clock_display.numbers(60,00)
+clock_display.numbers(TOTAL_MINUTES,00)
 
 
 def pin_id(pin):
